@@ -1,15 +1,15 @@
 ###### Example Config File ######
 # git:
 #   token: "my-test-git-token"      # this is the github api token
-#   repo-name: "repo-test-name"     # this is the repo the bot uses to make commits
+#   repo-name: "GitHubContributionBot"     # this is the repo the bot uses to make commits
 # contributions:
 #   runEvery: 10                    # this indicates how often the bot is run (every 10 min in the example) by cronjob
-#   contributionsPerDay: 4          # this is the number how many contributions the bot should make per day (based on probabilty)
+#   contributionsPerDay: 4          # this is the number how many contributions the bot should make per day (based on probability)
 
 
 git:
   token: "my-test-git-token"
-  repo-name: "repo-test-name"
+  repo-name: "GitHubContributionBot"
 
 contributions:
   runEvery: 10
