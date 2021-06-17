@@ -1,3 +1,4 @@
+from typing import final
 import yaml
 import logging
 import random
@@ -29,15 +30,16 @@ def loadConfig() -> dict:
     try:
         configDict['token'] = config['git']['token']
         configDict['repoName'] = config['git']['repo-name']
-        configDict['runsEvery'] = config['contributions']['runEvery']
+        configDict['runEvery'] = config['contributions']['runEvery']
         configDict['contributionsPerDay'] = config['contributions']['contributionsPerDay']
     except KeyError:
         logging.error("The config file misses a key! Copy 'config-example.yaml' to 'config.yaml'!")
+        exit()
 
     return configDict
 
 
-def calcRunProbability(runEvery: int, contributionPerDay: int) -> float:
+def calcRunProbability(runEvery: int, contributionsPerDay: int) -> float:
     '''
         Calculates the probability which we need to make contributionsPerDay 
         when the program is run `runEvery` minute. This obviously is based on
@@ -45,7 +47,7 @@ def calcRunProbability(runEvery: int, contributionPerDay: int) -> float:
     '''
 
     runsPerDay = 24 * 60 / runEvery
-    contributionProbability = contributionPerDay / runsPerDay
+    contributionProbability = contributionsPerDay / runsPerDay
     return contributionProbability
 
 
@@ -76,11 +78,13 @@ def makeCommit(g: Github, repoName: str) -> None:
         repo = gitUser.get_repo(repoName)
     except BadCredentialsException:
         logging.error("The GitHub credentials seems to be wrong.")
+        exit()
     except UnknownObjectException:
         logging.error(f"The specified repo-name: {repoName} isn't accessible/created")
+        exit()
 
     # if the working file doesn't exists create it
-    if (not checkFileExistence(repo, WORKING_DIR_PATH, WORKING_FILE_NAME)):
+    if (not checkFileExistence(repo, WORKING_FILE_PATH)):
         repo.create_file(WORKING_FILE_PATH, "Creating Working File", "")
         
     # get the yaml file, parse it and get some information about it
@@ -88,7 +92,11 @@ def makeCommit(g: Github, repoName: str) -> None:
     yamlFileSha = yamlFile.sha
     yamlFileContentStr = yamlFile.content
     yamlDict = yaml.safe_load(yamlFileContentStr)
-        
+    
+    # short check if yaml dict was probably None (false format or something)
+    if not yamlDict:
+        yamlDict = {}
+
     # get todays string and increment the contribution counter
     todayStr = str(date.today())
     yamlDict.setdefault(todayStr, 0)
@@ -112,7 +120,7 @@ def main():
     runProb = calcRunProbability(configDict['runEvery'], configDict['contributionsPerDay'])
 
     # get random bool and if true make a commit (boolean based on probability)
-    if (randomProbability(runProb)):
+    if (True):
         makeCommit(g, configDict['repoName'])
 
 
