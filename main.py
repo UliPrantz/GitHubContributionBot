@@ -1,7 +1,7 @@
-from typing import final
 import yaml
 import logging
 import random
+import base64
 from datetime import date, datetime
 from github import Github, Repository
 from github.GithubException import BadCredentialsException, UnknownObjectException
@@ -90,7 +90,8 @@ def makeCommit(g: Github, repoName: str) -> None:
     # get the yaml file, parse it and get some information about it
     yamlFile = repo.get_contents(WORKING_FILE_PATH)
     yamlFileSha = yamlFile.sha
-    yamlFileContentStr = yamlFile.content
+    yamlFileContentBase64 = yamlFile.content
+    yamlFileContentStr = base64.b64decode(yamlFileContentBase64).decode('utf-8')
     yamlDict = yaml.safe_load(yamlFileContentStr)
     
     # short check if yaml dict was probably None (false format or something)
